@@ -1,0 +1,3 @@
+(executable
+ (name ex_caml)
+ (libraries fmt sage caml))

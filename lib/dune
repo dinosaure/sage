@@ -1,0 +1,10 @@
+(library
+ (name sage)
+ (public_name sage)
+ (modules sage))
+
+(library
+ (name caml)
+ (public_name sage.caml)
+ (modules caml)
+ (libraries sage))

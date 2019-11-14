@@ -4,7 +4,19 @@
  (modules sage))
 
 (library
- (name caml)
+ (name sage_caml)
  (public_name sage.caml)
- (modules caml)
+ (modules sage_caml)
  (libraries sage))
+
+(library
+ (name sage_unix)
+ (public_name sage.unix)
+ (modules sage_unix)
+ (libraries unix sage))
+
+(library
+ (name sage_lwt)
+ (public_name sage.lwt)
+ (modules sage_lwt)
+ (libraries lwt sage))

@@ -24,11 +24,9 @@ type 's scheduler =
 type 'a capabilities =
   | RD_ONLY : < rd : unit; > capabilities
   | WR_ONLY : < wr : unit; > capabilities
-  | RDWR : < rd: unit; wr: unit; > capabilities
 
 let ro = RD_ONLY
 let wo = WR_ONLY
-let rdwr = RDWR
 
 type 'a opened = | constraint 'a = < .. >
 type closed = |

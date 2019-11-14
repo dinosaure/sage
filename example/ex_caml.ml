@@ -9,7 +9,7 @@ let m path =
   Fmt.pr "%s" (Bytes.sub_string buf 0 len) ; close
 
 let () =
-  let s, () = Caml.run closed (m Sys.argv.(1)) in
+  let s, () = Sage_caml.run closed (m Sys.argv.(1)) in
   match is_closed s with
   | Some Refl -> ()
   | None -> assert false

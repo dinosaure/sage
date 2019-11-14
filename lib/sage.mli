@@ -1,7 +1,10 @@
+(** Sage library, a safe ang agnostic library to handle I/O. *)
+
 module type FUNCTOR = sig type 'a t end
 module Refl : sig type ('a, 'b) t = Refl : ('a, 'a) t end
 
 type ('a, 's) io
+(** Abstracted type of the monadic scheduler ([lwt], [async] or [unix]). *)
 
 module Make (T : FUNCTOR) : sig
   type 'a s = 'a T.t
@@ -14,20 +17,20 @@ end
 type 's scheduler =
   { bind : 'a 'b. ('a, 's) io -> ('a -> ('b, 's) io) -> ('b, 's) io
   ; return : 'a. 'a -> ('a, 's) io }
+(** Light implementation of the monadic scheduler. *)
 
 type 'a capabilities =
   | RD_ONLY : < rd : unit; > capabilities
   | WR_ONLY : < wr : unit; > capabilities
-  | RDWR : < rd: unit; wr: unit; > capabilities
 
 val ro : < rd : unit; > capabilities
 val wo : < wr : unit; > capabilities
-val rdwr : < rd : unit; wr : unit; > capabilities
 
 type 'a opened constraint 'a = < .. >
 type closed
 
 type ('path, 'p, 'q, 'a) t
+(** Type of the I/O {i fiber}. *)
 
 val return : 'a -> ('path, 'p, 'p, 'a) t
 val map : ('path, 'p, 'q, 'a) t -> ('a -> 'b) -> ('path, 'p, 'q, 'b) t
@@ -41,15 +44,22 @@ val close : ('path, 'a opened, closed, unit) t
 type ('c, 'fd) state
 
 val closed : (closed, _) state
+(** Initial state for any computation. *)
+
 val is_closed : ('s, 'fd) state -> ('s, closed) Refl.t option
+(** [is_closed s] proves that [s] is properly closed. *)
 
 type ('path, 'fd, 's) syscall =
   { op : 'a. 'a capabilities -> 'path -> ('fd, 's) io
   ; rd : 'fd -> bytes -> off:int -> len:int -> (int, 's) io
   ; wr : 'fd -> bytes -> off:int -> len:int -> (int, 's) io
   ; close : 'fd -> (unit, 's) io }
+(** Light implementation of underlying {i syscalls} used to {!run} the {i fiber}. *)
 
 val run : 's scheduler -> ('path, 'fd, 's) syscall -> ('p, 'fd) state -> ('path, 'p, 'q, 'a) t -> (('q, 'fd) state * 'a, 's) io
+(** [run scheduler syscall state m] runs [m] with the pre-condition [state] and
+   return a {i promise} (according [scheduler]) with the post-condition and
+   value computed by [m]. *)
 
 val ( let+ ) : ('path, 'p, 'q, 'a) t -> ('a -> 'b) -> ('path, 'p, 'q, 'b) t
 val ( let* ) : ('path, 'p, 'q, 'a) t -> ('a -> ('path, 'q, 'r, 'b) t) -> ('path, 'p, 'r, 'b) t

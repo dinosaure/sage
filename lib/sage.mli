@@ -24,7 +24,10 @@ type 'a capabilities =
   | WR_ONLY : < wr : unit; > capabilities
 
 val ro : < rd : unit; > capabilities
+(** Read-only capability. *)
+
 val wo : < wr : unit; > capabilities
+(** Write-only capability. *)
 
 type 'a opened constraint 'a = < .. >
 type closed

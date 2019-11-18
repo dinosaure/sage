@@ -1,6 +1,7 @@
 open Sage
 
 module Lwt_scheduler = Make (struct type 'a t = 'a Lwt.t end)
+type lwt = Lwt_scheduler.t
 
 let lwt =
   let open Lwt_scheduler in
@@ -18,6 +19,9 @@ module type SYSCALL = sig
   val write : t -> bytes -> off:int -> len:int -> int Lwt.t
   val close : t -> unit Lwt.t
 end
+
+let inj = Lwt_scheduler.inj
+let prj = Lwt_scheduler.prj
 
 let run
   : type fd path p q a.

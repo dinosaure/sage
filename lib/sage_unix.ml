@@ -1,6 +1,7 @@
 open Sage
 
 module Unix_scheduler = Make (struct type 'a t = 'a end)
+type unix = Unix_scheduler.t
 
 let unix =
   let open Unix_scheduler in
@@ -26,6 +27,9 @@ let unix_syscall ~perm =
   let close fd = return (Unix.close fd) in
 
   { op; rd; wr; close; }
+
+let inj = Unix_scheduler.inj
+let prj = Unix_scheduler.prj
 
 let run
   : type p q a. perm:Unix.file_perm -> (p, fd) state -> (string, p, q, a) t -> (q, fd) state * a

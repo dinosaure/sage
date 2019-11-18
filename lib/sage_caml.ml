@@ -1,6 +1,7 @@
 open Sage
 
 module Caml_scheduler = Make (struct type 'a t = 'a end)
+type caml = Caml_scheduler.t
 
 let caml =
   let open Caml_scheduler in
@@ -35,6 +36,9 @@ let caml_syscall =
     | WR_ONLY oc -> return (close_out oc) in
 
   { op; rd; wr; close; }
+
+let inj = Caml_scheduler.inj
+let prj = Caml_scheduler.prj
 
 let run
   : type p q a. (p, fd) state -> (string, p, q, a) t -> (q, fd) state * a

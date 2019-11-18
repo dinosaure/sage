@@ -1,3 +1,5 @@
+type lwt
+
 module type SYSCALL = sig
   type t
   type path
@@ -8,6 +10,9 @@ module type SYSCALL = sig
   val write : t -> bytes -> off:int -> len:int -> int Lwt.t
   val close : t -> unit Lwt.t
 end
+
+val inj : 'a Lwt.t -> ('a, lwt) Sage.io
+val prj : ('a, lwt) Sage.io -> 'a Lwt.t 
 
 val run
   : (module SYSCALL with type t = 'fd and type path = 'path) ->

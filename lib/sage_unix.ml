@@ -25,8 +25,11 @@ let unix_syscall ~perm =
     : fd -> bytes -> off:int -> len:int -> (int, Unix_scheduler.t) io
     = fun fd buf ~off ~len -> return (Unix.write fd buf off len) in
   let close fd = return (Unix.close fd) in
+  let ln fd =
+    let st = Unix.LargeFile.fstat fd in
+    return st.Unix.LargeFile.st_size in
 
-  { op; rd; wr; close; }
+  { op; rd; wr; ln; close; }
 
 let inj = Unix_scheduler.inj
 let prj = Unix_scheduler.prj

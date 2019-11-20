@@ -35,7 +35,11 @@ let caml_syscall =
     | RD_ONLY ic -> return (close_in ic)
     | WR_ONLY oc -> return (close_out oc) in
 
-  { op; rd; wr; close; }
+  let ln = function
+    | RD_ONLY ic -> return (Int64.of_int (in_channel_length ic))
+    | WR_ONLY oc -> return (Int64.of_int (out_channel_length oc)) in
+
+  { op; rd; wr; ln; close; }
 
 let inj = Caml_scheduler.inj
 let prj = Caml_scheduler.prj

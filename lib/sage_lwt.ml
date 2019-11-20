@@ -15,6 +15,7 @@ module type SYSCALL = sig
 
   val open_ro : path -> t Lwt.t
   val open_wo : path -> t Lwt.t
+  val length : t -> int64 Lwt.t
   val read : t -> bytes -> off:int -> len:int -> int Lwt.t
   val write : t -> bytes -> off:int -> len:int -> int Lwt.t
   val close : t -> unit Lwt.t
@@ -35,6 +36,7 @@ let run
       | Sage.WR_ONLY -> fun path -> inj (Syscall.open_wo path) in
     let rd fd buf ~off ~len = inj (Syscall.read fd buf ~off ~len) in
     let wr fd buf ~off ~len = inj (Syscall.write fd buf ~off ~len) in
+    let ln fd = inj (Syscall.length fd) in
     let close fd = inj (Syscall.close fd) in
 
-    let v = Lwt_scheduler.prj (run lwt { op; rd; wr; close; } s m) in v
+    let v = Lwt_scheduler.prj (run lwt { op; rd; wr; ln; close; } s m) in v

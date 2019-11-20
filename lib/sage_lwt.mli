@@ -6,6 +6,7 @@ module type SYSCALL = sig
 
   val open_ro : path -> t Lwt.t
   val open_wo : path -> t Lwt.t
+  val length : t -> int64 Lwt.t
   val read : t -> bytes -> off:int -> len:int -> int Lwt.t
   val write : t -> bytes -> off:int -> len:int -> int Lwt.t
   val close : t -> unit Lwt.t

@@ -1,0 +1,8 @@
+(executable
+ (name test)
+ (libraries sage.caml alcotest))
+
+(alias
+ (name runtest)
+ (deps (:test test.exe) test01.txt)
+ (action (run %{test} --color=always)))

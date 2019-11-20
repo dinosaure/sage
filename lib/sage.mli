@@ -39,10 +39,11 @@ val return : 'a -> ('path, 'p, 'p, 'a) t
 val map : ('path, 'p, 'q, 'a) t -> ('a -> 'b) -> ('path, 'p, 'q, 'b) t
 val both : ('path, 'p, 'q, 'a) t -> ('path, 'q, 'r, 'b) t -> ('path, 'p, 'r, 'a * 'b) t
 val bind : ('path, 'p, 'q, 'a) t -> ('a -> ('path, 'q, 'r, 'b) t) -> ('path, 'p, 'r, 'b) t
-val open_path : 'c capabilities -> path:'path -> ('path, closed, 'c opened, unit) t
+val open_file : 'c capabilities -> path:'path -> ('path, closed, 'c opened, unit) t
 val read : bytes -> off:int -> len:int -> ('path, < rd: unit; .. > opened, < rd : unit; .. > opened, int) t
 val write : bytes -> off:int -> len:int -> ('path, < wr : unit; .. > opened, < wr : unit; .. > opened, int) t
 val close : ('path, 'a opened, closed, unit) t
+val length : ('path, 'a opened, 'a opened, int64) t
 
 type ('c, 'fd) state
 
@@ -56,6 +57,7 @@ type ('path, 'fd, 's) syscall =
   { op : 'a. 'a capabilities -> 'path -> ('fd, 's) io
   ; rd : 'fd -> bytes -> off:int -> len:int -> (int, 's) io
   ; wr : 'fd -> bytes -> off:int -> len:int -> (int, 's) io
+  ; ln : 'fd -> (int64, 's) io
   ; close : 'fd -> (unit, 's) io }
 (** Light implementation of underlying {i syscalls} used to {!run} the {i fiber}. *)
 

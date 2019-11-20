@@ -1,7 +1,8 @@
 (library
  (name sage)
  (public_name sage)
- (modules sage))
+ (modules sage)
+ (preprocess future_syntax))
 
 (library
  (name sage_caml)
@@ -11,12 +12,14 @@
 
 (library
  (name sage_unix)
+ (optional)
  (public_name sage.unix)
  (modules sage_unix)
  (libraries unix sage))
 
 (library
  (name sage_lwt)
+ (optional)
  (public_name sage.lwt)
  (modules sage_lwt)
  (libraries lwt sage))

@@ -18,3 +18,8 @@ depends: [
   "dune"
   "base-bytes"
 ]
+
+depopts: [
+  "base-unix"
+  "lwt"
+]

@@ -1,6 +1,7 @@
 type fd
 type caml
 
+val caml : caml Sage.scheduler
 val inj : 'a -> ('a, caml) Sage.io
 val prj : ('a, caml) Sage.io -> 'a
 

@@ -1,6 +1,7 @@
 type fd = Unix.file_descr
 type unix
 
+val unix : unix Sage.scheduler
 val inj : 'a -> ('a, unix) Sage.io
 val prj : ('a, unix) Sage.io -> 'a
 

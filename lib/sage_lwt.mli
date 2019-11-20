@@ -11,6 +11,7 @@ module type SYSCALL = sig
   val close : t -> unit Lwt.t
 end
 
+val lwt : lwt Sage.scheduler
 val inj : 'a Lwt.t -> ('a, lwt) Sage.io
 val prj : ('a, lwt) Sage.io -> 'a Lwt.t 
 

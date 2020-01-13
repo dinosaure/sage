@@ -18,4 +18,4 @@ val prj : ('a, lwt) Sage.io -> 'a Lwt.t
 
 val run
   : (module SYSCALL with type t = 'fd and type path = 'path) ->
-    ('p, 'fd) Sage.state -> ('path, 'p, 'q, 'a) Sage.t -> (('q, 'fd) Sage.state * 'a) Lwt.t
+    ('p, 'fd) Sage.state -> ('path, 'p, 'q, 'a, lwt) Sage.t -> (('q, 'fd) Sage.state * 'a) Lwt.t

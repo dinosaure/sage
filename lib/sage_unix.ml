@@ -35,6 +35,6 @@ let inj = Unix_scheduler.inj
 let prj = Unix_scheduler.prj
 
 let run
-  : type p q a. perm:Unix.file_perm -> (p, fd) state -> (string, p, q, a) t -> (q, fd) state * a
+  : type p q a. perm:Unix.file_perm -> (p, fd) state -> (string, p, q, a, unix) t -> (q, fd) state * a
   = fun ~perm s m ->
     let v = Unix_scheduler.prj (run unix (unix_syscall ~perm) s m) in v

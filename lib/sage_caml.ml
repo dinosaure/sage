@@ -45,6 +45,6 @@ let inj = Caml_scheduler.inj
 let prj = Caml_scheduler.prj
 
 let run
-  : type p q a. (p, fd) state -> (string, p, q, a) t -> (q, fd) state * a
+  : type p q a. (p, fd) state -> (string, p, q, a, caml) t -> (q, fd) state * a
   = fun s m ->
     let v = Caml_scheduler.prj (run caml caml_syscall s m) in v

@@ -27,7 +27,7 @@ let prj = Lwt_scheduler.prj
 let run
   : type fd path p q a.
     (module SYSCALL with type t = fd and type path = path) ->
-    (p, fd) state -> (path, p, q, a) t -> ((q, fd) state * a) Lwt.t
+    (p, fd) state -> (path, p, q, a, lwt) t -> ((q, fd) state * a) Lwt.t
   = fun (module Syscall) s m ->
     let inj = Lwt_scheduler.inj in
 

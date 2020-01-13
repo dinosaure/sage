@@ -31,16 +31,17 @@ let wo = WR_ONLY
 type 'a opened = | constraint 'a = < .. >
 type closed = |
 
-type ('path, 'p, 'q, 'a) t =
-  | Return : 'a -> ('path, 'p, 'p, 'a) t
-  | Map    : ('path, 'p, 'q, 'a) t * ('a -> 'b) -> ('path, 'p, 'q, 'b) t
-  | Both   : ('path, 'p, 'q, 'a) t * ('path, 'q, 'r, 'b) t -> ('path, 'p, 'r, 'a * 'b) t
-  | Bind   : ('path, 'p, 'q, 'a) t * ('a -> ('path, 'q, 'r, 'b) t) -> ('path, 'p, 'r, 'b) t
-  | Open   : 'c capabilities * 'path -> ('path, closed, 'c opened, unit) t
-  | Read   : bytes * int * int -> ('path, < rd: unit; .. > opened, < rd: unit; .. > opened, int) t
-  | Write  : bytes * int * int -> ('path, < wr: unit; .. > opened, < wr: unit; .. > opened, int) t
-  | Length : ('path, 'a opened, 'a opened, int64) t
-  | Close  : ('path, 'a opened, closed, unit) t
+type ('path, 'p, 'q, 'a, 's) t =
+  | Return : 'a -> ('path, 'p, 'p, 'a, 's) t
+  | Map    : ('path, 'p, 'q, 'a, 's) t * ('a -> 'b) -> ('path, 'p, 'q, 'b, 's) t
+  | Both   : ('path, 'p, 'q, 'a, 's) t * ('path, 'q, 'r, 'b, 's) t -> ('path, 'p, 'r, 'a * 'b, 's) t
+  | Bind   : ('path, 'p, 'q, 'a, 's) t * ('a -> ('path, 'q, 'r, 'b, 's) t) -> ('path, 'p, 'r, 'b, 's) t
+  | Open   : 'c capabilities * 'path -> ('path, closed, 'c opened, unit, 's) t
+  | Read   : bytes * int * int -> ('path, < rd: unit; .. > opened, < rd: unit; .. > opened, int, 's) t
+  | Write  : bytes * int * int -> ('path, < wr: unit; .. > opened, < wr: unit; .. > opened, int, 's) t
+  | Length : ('path, 'a opened, 'a opened, int64, 's) t
+  | Close  : ('path, 'a opened, closed, unit, 's) t
+  | V      : ('a, 's) io -> ('path, 'p, 'p, 'a, 's) t
 
 let return x = Return x
 let map m f = Map (m, f)
@@ -51,6 +52,7 @@ let read buf ~off ~len = Read (buf, off, len)
 let write buf ~off ~len = Write (buf, off, len)
 let length = Length
 let close = Close
+let v fiber = V fiber
 
 type ('c, 'fd) state =
   | Opened : 'fd -> ('c opened, 'fd) state
@@ -72,12 +74,12 @@ type ('path, 'fd, 's) syscall =
   ; close : 'fd -> (unit, 's) io }
 
 let run
-  : type a s p q path fd. s scheduler -> (path, fd, s) syscall -> (p, fd) state -> (path, p, q, a) t -> ((q, fd) state * a, s) io
+  : type a s p q path fd. s scheduler -> (path, fd, s) syscall -> (p, fd) state -> (path, p, q, a, s) t -> ((q, fd) state * a, s) io
   = fun { bind; return; } syscall s m ->
     let ( >>= ) = bind in
 
     let rec go
-    : type a p q. (p, fd) state -> (path, p, q, a) t -> ((q, fd) state * a, s) io
+    : type a p q. (p, fd) state -> (path, p, q, a, s) t -> ((q, fd) state * a, s) io
     = fun s m -> match m, s with
       | Return x, _ -> return (s, x)
       | Map (m, f), _ ->
@@ -97,7 +99,9 @@ let run
       | Length, Opened fd ->
         syscall.ln fd >>= fun len -> return (Opened fd, len)
       | Close, Opened fd ->
-        syscall.close fd >>= fun () -> return (Closed, ()) in
+        syscall.close fd >>= fun () -> return (Closed, ())
+      | V v, s ->
+        v >>= fun x -> return (s, x) in
     go s m >>= function (s, v) -> return (s, v)
 
 let ( let+ ) = map
